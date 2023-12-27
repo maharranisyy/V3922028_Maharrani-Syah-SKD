@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Affine Chiper</title>
+    <script type="text/javascript">
+        // Fungsi untuk mencari Faktor Persekutuan Terbesar (FPB) dari a dan b
+        function gcd(a, b) {
+            while (b != 0) {
+                a, b = b, a % b;
+            }
+            return a;
+        }
+
+        // Fungsi untuk mencari invers modulo a terhadap m
+        function mod_inverse(a, m) {
+            for (var x = 1; x < m; x++) {
+                if ((a * x) % m == 1) {
+                    return x;
+                }
+            }
+            return null;
+        }
+
+        // Fungsi untuk mengenkripsi teks menggunakan Affine Cipher
+        function affine_encrypt(plain_text, a, b) {
+            var encrypted_text = "";
+            var m = 26; // Jumlah karakter alfabet
+
+            for (var i = 0; i < plain_text.length; i++) {
+                var char = plain_text[i];
+                if (char.match(/[A-Za-z]/)) {
+                    var is_upper = char === char.toUpperCase();
+                    char = char.toUpperCase();
+                    var char_code = char.charCodeAt(0) - 'A'.charCodeAt(0);
+
+                    if (is_upper) {
+                        encrypted_text += String.fromCharCode(((a * char_code + b) % m) + 'A'.charCodeAt(0));
+                    } else {
+                        encrypted_text += String.fromCharCode(((a * char_code + b) % m) + 'a'.charCodeAt(0));
+                    }
+                } else {
+                    encrypted_text += char;
+                }
+            }
+
+            return encrypted_text;
+        }
+
+        // Fungsi untuk mendekripsi teks menggunakan Affine Cipher
+        function affine_decrypt(cipher_text, a, b) {
+            var decrypted_text = "";
+            var m = 26; // Jumlah karakter alfabet
+            var a_inverse = mod_inverse(a, m);
+
+            if (a_inverse === null) {
+                return "Kunci tidak valid";
+            }
+
+            for (var i = 0; i < cipher_text.length; i++) {
+                var char = cipher_text[i];
+                if (char.match(/[A-Za-z]/)) {
+                    var is_upper = char === char.toUpperCase();
+                    char = char.toUpperCase();
+                    var char_code = char.charCodeAt(0) - 'A'.charCodeAt(0);
+
+                    if (is_upper) {
+                        decrypted_text += String.fromCharCode(((a_inverse * (char_code - b + m)) % m) + 'A'.charCodeAt(0));
+                    } else {
+                        decrypted_text += String.fromCharCode(((a_inverse * (char_code - b + m)) % m) + 'a'.charCodeAt(0));
+                    }
+                } else {
+                    decrypted_text += char;
+                }
+            }
+
+            return decrypted_text;
+        }
+
+        // Fungsi untuk mengenkripsi dan mendekripsi teks
+        function encryptAndDecrypt() {
+            var plain_text = document.getElementById("plain_text").value;
+            var a = parseInt(document.getElementById("a").value);
+            var b = parseInt(document.getElementById("b").value);
+
+            var encrypted_text = affine_encrypt(plain_text, a, b);
+            var decrypted_text = affine_decrypt(encrypted_text, a, b);
+
+            document.getElementById("encrypted_text").innerHTML = "Ciphertext: " + encrypted_text;
+            document.getElementById("decrypted_text").innerHTML = "Decrypted Text: " + decrypted_text;
+        }
+    </script>
+</head>
+<body>
+    <h1>Affine Chiper</h1>
+    <p>Enter Plain Text:</p>
+    <input type="text" id="plain_text">
+    <p>Enter a (Coprime with 26):</p>
+    <input type="number" id="a">
+    <p>Enter b:</p>
+    <input type="number" id="b">
+    <br><br>
+    <button onclick="encryptAndDecrypt()">Encrypt & Decrypt</button>
+    <br><br>
+    <p id="encrypted_text"></p>
+    <p id="decrypted_text"></p>
+</body>
+</html>

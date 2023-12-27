@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Playfair Cipher</title>
+</head>
+<body>
+    <h1>Playfair Cipher</h1>
+    <label for="plaintext">Masukkan teks:</label>
+    <input type="text" id="plaintext" placeholder="Masukkan teks" size="50">
+    <br>
+    <label for="key">Masukkan kata kunci:</label>
+    <input type="text" id="key" placeholder="Kata kunci" size="50">
+    <br>
+    <button onclick="encrypt()">Enkripsi</button>
+    <button onclick="decrypt()">Dekripsi</button>
+    <br>
+    <h2>Hasil:</h2>
+    <textarea id="result" rows="4" cols="50" readonly></textarea>
+
+    <script>
+        function createPlayfairMatrix(key) {
+            // Buat matriks Playfair di sini
+            key = key.toUpperCase().replace(/J/g, 'I');
+            const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
+            const matrix = [];
+
+            // Isi matriks dengan kata kunci
+            for (let i = 0; i < key.length; i++) {
+                if (!matrix.includes(key[i]) && key[i] !== ' ') {
+                    matrix.push(key[i]);
+                }
+            }
+
+            // Isi matriks dengan abjad yang tersisa
+            for (let i = 0; i < alphabet.length; i++) {
+                if (!matrix.includes(alphabet[i])) {
+                    matrix.push(alphabet[i]);
+                }
+            }
+
+            return matrix;
+        }
+
+        function findCharPositions(matrix, char) {
+            // Temukan posisi karakter dalam matriks
+            const index = matrix.indexOf(char);
+            const row = Math.floor(index / 5);
+            const col = index % 5;
+            return { row, col };
+        }
+
+        function playfairEncrypt(plainText, key) {
+            // Implementasi enkripsi Playfair di sini
+            const matrix = createPlayfairMatrix(key);
+            plainText = plainText.toUpperCase().replace(/J/g, 'I').replace(/ /g, '');
+            const encryptedText = [];
+
+            let i = 0;
+            while (i < plainText.length) {
+                let char1 = plainText[i];
+                let char2 = '';
+                if (i + 1 < plainText.length) {
+                    char2 = plainText[i + 1];
+                }
+
+                if (char1 === char2) {
+                    char2 = 'X';
+                    i++;
+                }
+
+                const pos1 = findCharPositions(matrix, char1);
+                const pos2 = findCharPositions(matrix, char2);
+
+                if (pos1.row === pos2.row) {
+                    encryptedText.push(matrix[pos1.row * 5 + (pos1.col + 1) % 5]);
+                    encryptedText.push(matrix[pos2.row * 5 + (pos2.col + 1) % 5]);
+                } else if (pos1.col === pos2.col) {
+                    encryptedText.push(matrix[((pos1.row + 1) % 5) * 5 + pos1.col]);
+                    encryptedText.push(matrix[((pos2.row + 1) % 5) * 5 + pos2.col]);
+                } else {
+                    encryptedText.push(matrix[pos1.row * 5 + pos2.col]);
+                    encryptedText.push(matrix[pos2.row * 5 + pos1.col]);
+                }
+
+                i += 2;
+            }
+
+            return encryptedText.join('');
+        }
+
+        function playfairDecrypt(cipherText, key) {
+            // Implementasi dekripsi Playfair di sini
+            const matrix = createPlayfairMatrix(key);
+            const decryptedText = [];
+
+            let i = 0;
+            while (i < cipherText.length) {
+                const char1 = cipherText[i];
+                const char2 = cipherText[i + 1];
+
+                const pos1 = findCharPositions(matrix, char1);
+                const pos2 = findCharPositions(matrix, char2);
+
+                if (pos1.row === pos2.row) {
+                    decryptedText.push(matrix[pos1.row * 5 + (pos1.col - 1 + 5) % 5]);
+                    decryptedText.push(matrix[pos2.row * 5 + (pos2.col - 1 + 5) % 5]);
+                } else if (pos1.col === pos2.col) {
+                    decryptedText.push(matrix[((pos1.row - 1 + 5) % 5) * 5 + pos1.col]);
+                    decryptedText.push(matrix[((pos2.row - 1 + 5) % 5) * 5 + pos2.col]);
+                } else {
+                    decryptedText.push(matrix[pos1.row * 5 + pos2.col]);
+                    decryptedText.push(matrix[pos2.row * 5 + pos1.col]);
+                }
+
+                i += 2;
+            }
+
+            return decryptedText.join('');
+        }
+
+        function encrypt() {
+            const plainText = document.getElementById('plaintext').value;
+            const key = document.getElementById('key').value;
+            const cipherText = playfairEncrypt(plainText, key);
+            document.getElementById('result').value = cipherText;
+        }
+
+        function decrypt() {
+            const cipherText = document.getElementById('result').value;
+            const key = document.getElementById('key').value;
+            const decryptedText = playfairDecrypt(cipherText, key);
+            document.getElementById('result').value = decryptedText;
+        }
+    </script>
+</body>
+</html>

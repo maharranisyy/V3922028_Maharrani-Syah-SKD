@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hill Cipher Encryption/Decryption</title>
+</head>
+<body>
+    <h1>Hill Cipher Encryption/Decryption</h1>
+
+    <form id="hillCipherForm">
+        <label for="plaintext">Plaintext:</label>
+        <input type="text" id="plaintext" name="plaintext" required>
+
+        <button type="button" onclick="encrypt()">Encrypt</button>
+        <button type="button" onclick="decrypt()">Decrypt</button>
+
+        <h3>Results:</h3>
+        <p id="ciphertext">Ciphertext: </p>
+        <p id="decryptedText">Decrypted Text: </p>
+    </form>
+
+    <script>
+        function encrypt() {
+            const plaintext = document.getElementById("plaintext").value;
+
+            // Kirim plaintext ke server untuk dienkripsi
+            fetch('/encrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ plaintext }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("ciphertext").innerText = "Ciphertext: " + data.ciphertext;
+            });
+        }
+
+        function decrypt() {
+            const ciphertext = document.getElementById("plaintext").value;
+
+            // Kirim ciphertext ke server untuk didekripsi
+            fetch('/decrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ciphertext }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("decryptedText").innerText = "Decrypted Text: " + data.decryptedText;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vigenere Cipher</title>
+<style>
+/* CSS untuk mengatur tampilan halaman */
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+}
+h1 {
+text-align: center;
+}
+form {
+text-align: center;
+}
+label {
+font-weight: bold;
+}
+input[type="text"] {
+padding: 5px;
+width: 200px;
+margin: 5px;
+}
+input[type="button"] {
+padding: 10px 20px;
+font-size: 16px;
+margin: 10px;
+}
+h2 {
+text-align: center;
+}
+span {
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+<h1>Vigenere Cipher</h1>
+<form id="vigenereForm">
+<label for="plainText">Teks Asli:</label>
+<input type="text" name="plainText" id="plainText" required>
+<br><br>
+<label for="key">Kunci:</label>
+<input type="text" name="key" id="key" required>
+<br><br>
+<input type="button" value="Enkripsi" onclick="encrypt()">
+<input type="button" value="Dekripsi" onclick="decrypt()">
+</form>
+<h2>Hasil:</h2>
+<p>Teks Terenkripsi: <span id="encryptedText"></span></p>
+<p>Teks Terdekripsi: <span id="decryptedText"></span></p>
+<script>
+// Fungsi untuk mengenkripsi teks menggunakan Vigenere Cipher
+function vigenereEncrypt(plainText, key) {
+let encryptedText = "";
+let keyIndex = 0;
+for (let i = 0; i < plainText.length; i++) {
+const char = plainText[i];
+if (char.match(/[a-zA-Z]/)) {
+const keyChar = key[keyIndex % key.length];
+const shift = keyChar.charCodeAt(0) - 'A'.charCodeAt(0);
+let encryptedChar;
+if (char.match(/[A-Z]/)) {
+encryptedChar = String.fromCharCode(((char.charCodeAt(0) -
+'A'.charCodeAt(0) + shift) % 26) + 'A'.charCodeAt(0));
+} else {
+encryptedChar = String.fromCharCode(((char.charCodeAt(0) -
+'a'.charCodeAt(0) + shift) % 26) + 'a'.charCodeAt(0));
+}
+encryptedText += encryptedChar;
+keyIndex++;
+} else {
+encryptedText += char;
+}
+}
+return encryptedText;
+}
+// Fungsi untuk mendekripsi teks menggunakan Vigenere Cipher
+function vigenereDecrypt(encryptedText, key) {
+let decryptedText = "";
+let keyIndex = 0;
+for (let i = 0; i < encryptedText.length; i++) {
+const char = encryptedText[i];
+if (char.match(/[a-zA-Z]/)) {
+const keyChar = key[keyIndex % key.length];
+const shift = keyChar.charCodeAt(0) - 'A'.charCodeAt(0);
+let decryptedChar;
+if (char.match(/[A-Z]/)) {
+decryptedChar = String.fromCharCode(((char.charCodeAt(0) -
+'A'.charCodeAt(0) - shift + 26) % 26) + 'A'.charCodeAt(0));
+} else {
+decryptedChar = String.fromCharCode(((char.charCodeAt(0) -
+'a'.charCodeAt(0) - shift + 26) % 26) + 'a'.charCodeAt(0));
+}
+decryptedText += decryptedChar;
+keyIndex++;
+} else {
+decryptedText += char;
+}
+}
+return decryptedText;
+}
+// Fungsi untuk mengenkripsi teks ketika tombol "Enkripsi" diklik
+function encrypt() {
+const plainText = document.getElementById("plainText").value;
+const key = document.getElementById("key").value;
+const encryptedText = vigenereEncrypt(plainText, key);
+document.getElementById("encryptedText").textContent = encryptedText;
+}
+// Fungsi untuk mendekripsi teks ketika tombol "Dekripsi" diklik
+function decrypt() {
+const encryptedText =
+document.getElementById("encryptedText").textContent;
+const key = document.getElementById("key").value;
+const decryptedText = vigenereDecrypt(encryptedText, key);
+document.getElementById("decryptedText").textContent = decryptedText;
+}
+</script>
+</body>
+</html>
